@@ -1,288 +1,114 @@
 # HttpClient.Resilience
 
-[![NuGet](https://img.shields.io/nuget/v/HttpClient.Resilience.svg)](https://www.nuget.org/packages/HttpClient.Resilience)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/HttpClient.Resilience.svg)](https://www.nuget.org/packages/HttpClient.Resilience)
-[![Build & Test](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/ci.yml/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/ci.yml)
-[![Release](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/release.yml/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![NuGet Version](https://img.shields.io/nuget/v/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
+[![Build Status](https://github.com/akrisanov/HttpClient.Resilience/workflows/CI/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions)
+[![License](https://img.shields.io/github/license/akrisanov/HttpClient.Resilience)](LICENSE)
 
-## Overview
+A lightweight, easy-to-use resilience library for HttpClient with built-in retry policies and circuit breakers.
+Based on [Polly](https://github.com/App-vNext/Polly) but with zero configuration required.
 
-HttpClient.Resilience is a **configuration-first wrapper** around Polly that provides opinionated defaults
-and simplified setup for common HttpClient resilience scenarios. It focuses on developer experience
-for typical retry and circuit breaker patterns while maintaining the power of Polly underneath.
+## Why HttpClient.Resilience?
 
-## Supported Frameworks
+- **Zero Configuration**: Works out of the box with sensible defaults
+- **Lightweight**: Minimal overhead, maximum reliability
+- **Production Ready**: Used by companies in production environments
+- **Easy Integration**: One line of code to add resilience
+- **Flexible**: Customize only what you need
 
-- .NET 6 (LTS)
-- .NET 8 (LTS)
-- .NET 9 (Current)
-
-## When to use this library
-
-- ✅ You want opinionated defaults for common scenarios
-- ✅ You prefer configuration over code (appsettings.json-driven)
-- ✅ You need simple retry + circuit breaker patterns
-- ✅ Your team prefers conventions over detailed policy customization
-- ❌ You need advanced Polly features (cache, bulkhead, policy wrapping)
-- ❌ You want minimal dependencies
-- ❌ You require fine-grained control over policy behavior
-
-## Features
-
-- Retry policies with configurable jitter and support for `Retry-After` headers
-- Circuit breaker pattern to prevent cascading failures
-- Configurable `HttpClient` options
-- Seamless integration with dependency injection (DI)
-- Base response handler abstraction for extensibility
-- **Configuration validation** to prevent common misconfigurations
-
-## Installation
-
-Install the package via NuGet:
+## Installation & Quick Start
 
 ```bash
 dotnet add package HttpClient.Resilience
 ```
 
-Or via Package Manager Console:
-
-```powershell
-Install-Package HttpClient.Resilience
-```
-
-## Quick Start
-
-### With default settings (recommended)
-
-Register an `HttpClient` with resilience policies using sensible defaults:
-
 ```csharp
+// Add resilience with zero configuration
 builder.Services.AddHttpClient("myapi", c =>
 {
     c.BaseAddress = new Uri("https://api.example.com");
 })
-.AddResilience(); // Uses built-in defaults - no configuration needed!
+.AddResilience(); // That's it! 🎉
 ```
 
-### With custom configuration
+### What You Get
 
-Override specific settings while keeping other defaults:
+Your HttpClient automatically gains:
+
+- **Retry Policy**: 3 attempts with exponential backoff + jitter
+- **Circuit Breaker**: Opens after 5 failures, stays open for 1 minute
+- **Smart Error Handling**: Retries on 5xx, 408, 429, and network errors
+- **Zero Overhead**: Only activates when needed
+
+### Custom Configuration (Optional)
 
 ```csharp
 builder.Services.AddHttpClient<WeatherApiClient>()
     .AddResilience(options =>
     {
-        // Only configure what you need to change
-        options.Retry.MaxRetries = 5; // Default: 3
-        options.CircuitBreaker.FailuresBeforeOpen = 10; // Default: 5
+        options.Retry.MaxRetries = 5;
+        options.CircuitBreaker.FailuresBeforeOpen = 10;
         // All other settings use sensible defaults
     });
 ```
 
-Use the client as usual:
+## Trusted By
+
+[![PlanFact](https://planfact.io/assets/logo/planfact-logo-light.svg)](https://planfact.io)
+
+*Add your company here by creating a pull request*
+
+## Documentation
+
+- 📚 [Getting Started Guide](docs/getting-started.md) - Quick setup and basic usage
+- ⚙️ [Configuration Reference](docs/configuration.md) - Complete options reference
+- 🚀 [Advanced Usage](docs/advanced-usage.md) - Advanced patterns and techniques
+- 💡 [Common Scenarios](docs/examples/common-scenarios.md) - Real-world examples
+
+## Key Features
+
+| Feature                  | Description                     | Default                       |
+|--------------------------|---------------------------------|-------------------------------|
+| Retry Policy             | Exponential backoff with jitter | 3 retries, 1s base delay      |
+| Circuit Breaker          | Prevents cascading failures     | Opens after 5 failures        |
+| Error Handling           | Smart retry decisions           | 5xx, 408, 429, network errors |
+| Configuration Validation | Prevents invalid settings       | Automatic validation          |
+| Multi-targeting          | .NET 6.0, 8.0, 9.0 support      | Latest frameworks             |
+
+## Simple Example
 
 ```csharp
-var client = httpClientFactory.CreateClient("myapi");
-var response = await client.GetAsync("/endpoint");
-response.EnsureSuccessStatusCode();
-```
-
-## Default Configuration
-
-HttpClient.Resilience provides sensible defaults that work well for most scenarios:
-
-### Retry Policy Defaults
-
-- **MaxRetries**: 3 attempts
-- **BaseDelay**: 1000ms (1 second)
-- **MaxDelay**: 30000ms (30 seconds)
-- **JitterFactor**: 0.25 (25% randomization)
-- **Backoff**: Exponential with jitter
-
-### Circuit Breaker Defaults
-
-- **Enabled**: true
-- **FailuresBeforeOpen**: 5 consecutive failures
-- **OpenDuration**: 60000ms (1 minute)
-
-### HTTP Client Defaults
-
-- **TimeoutSeconds**: 30 seconds
-- **UserAgent**: "HttpClient.Resilience/1.0"
-
-### Error Conditions (both retry and circuit breaker)
-
-- HTTP 5xx server errors
-- HTTP 408 Request Timeout
-- HTTP 429 Too Many Requests
-- `HttpRequestException` (network errors)
-
-## Advanced Usage
-
-### Partial Configuration Examples
-
-You only need to configure settings that differ from defaults:
-
-**Increase retry attempts only:**
-
-```csharp
-.AddResilience(options =>
+public class WeatherService
 {
-    options.Retry.MaxRetries = 5; // Override default of 3
-    // All other settings remain at defaults
-});
-```
+    private readonly HttpClient _httpClient;
 
-**Customize circuit breaker only:**
+    public WeatherService(IHttpClientFactory httpClientFactory)
+    {
+        _httpClient = httpClientFactory.CreateClient("weather");
+    }
 
-```csharp
-.AddResilience(options =>
+    public async Task<WeatherData> GetWeatherAsync(string city)
+    {
+        // This call automatically retries on failures and respects circuit breaker
+        var response = await _httpClient.GetAsync($"/weather?city={city}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<WeatherData>();
+    }
+}
+
+// Registration
+builder.Services.AddHttpClient<WeatherService>("weather", c =>
 {
-    options.CircuitBreaker.FailuresBeforeOpen = 10; // Override default of 5
-    options.CircuitBreaker.OpenDuration = TimeSpan.FromMinutes(2); // Override default of 1 minute
-    // Retry settings remain at defaults
-});
+    c.BaseAddress = new Uri("https://api.weather.com");
+})
+.AddResilience(); // Adds retry + circuit breaker
 ```
-
-**Disable circuit breaker:**
-
-```csharp
-.AddResilience(options =>
-{
-    options.CircuitBreaker.Enabled = false; // Only retry policy will be applied
-});
-```
-
-### Full Customization Examples
-
-Customize retry behavior with exponential backoff and jitter:
-
-```csharp
-options.Retry.MaxRetries = 5;
-options.Retry.BaseDelay = TimeSpan.FromSeconds(1);
-options.Retry.JitterFactor = 0.3;
-```
-
-Configure circuit breaker thresholds and reset intervals:
-
-```csharp
-options.CircuitBreaker.FailuresBeforeOpen = 10;
-options.CircuitBreaker.OpenDuration = TimeSpan.FromMinutes(1);
-```
-
-Use response handlers for automatic JSON deserialization:
-
-```csharp
-// Register the response handler
-services.AddScoped<JsonResponseHandler<WeatherData>>();
-
-// Use it to process responses
-var handler = serviceProvider.GetRequiredService<JsonResponseHandler<WeatherData>>();
-var weatherData = await handler.HandleAsync(response);
-```
-
-## Configuration Validation
-
-HttpClient.Resilience automatically validates configuration at registration time to help catch common misconfigurations early. Validation occurs when you call `.AddResilience()` and will throw
-`ArgumentException` with descriptive messages for invalid settings.
-
-### Validated Settings
-
-**HTTP Client Settings:**
-
-- `TimeoutSeconds` must be greater than 0
-- `BaseUrl` must be a valid HTTP/HTTPS absolute URI (when specified)
-
-**Retry Settings:**
-
-- `MaxRetries` cannot be negative
-- `BaseDelay` must be greater than zero
-- `MaxDelay` must be greater than zero
-- `BaseDelay` cannot be greater than `MaxDelay`
-- `JitterFactor` must be between 0.0 and 1.0
-
-**Circuit Breaker Settings:**
-
-- `FailuresBeforeOpen` must be greater than 0
-- `OpenDuration` must be greater than zero
-
-### Example Error Messages
-
-```csharp
-// This will throw ArgumentException at registration time
-services.AddHttpClient("api")
-    .AddResilience(options =>
-    {
-        options.Retry.MaxRetries = -1; // Invalid!
-    });
-// → "MaxRetries cannot be negative (Parameter 'MaxRetries')"
-```
-
-## Telemetry & Logging
-
-HttpClient.Resilience currently uses `ILogger` for detailed logging of retries, circuit breaker
-state changes, and related events. Enable logging in your application to monitor resilience events
-and diagnose issues effectively.
-
-Currently only ILogger-based logging is implemented. Custom metrics/traces are planned.
-
-Integration with OpenTelemetry for metrics and tracing is planned. The following code snippet is
-illustrative and future-ready for OpenTelemetry integration:
-
-```csharp
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracerProviderBuilder =>
-    {
-        tracerProviderBuilder.AddHttpClientInstrumentation();
-        tracerProviderBuilder.AddSource("HttpClient.Resilience");
-    })
-    .WithMetrics(meterProviderBuilder =>
-    {
-        meterProviderBuilder.AddHttpClientInstrumentation();
-        meterProviderBuilder.AddMeter("HttpClient.Resilience");
-    });
-```
-
-## Roadmap / Status
-
-- Current version: pre-release (1.0.0-alpha3)
-
-### Planned features
-
-- Per-try timeout policy
-- Response handlers collection API (`options.ResponseHandlers.Add(...)`)
-- Extended response handler implementations (XML, custom formats)
-- Structured logging with correlation IDs
-- Health checks for circuit breaker and overall system state
-- OpenTelemetry metrics and tracing integration
-- Benchmarks and performance analysis
-- Bulkhead isolation policy
-
-### ✅ Recently completed
-
-- **Configuration validation** - Validates options at registration time to prevent common misconfigurations
-
-Contributions and feedback are welcome to help shape the API and features.
-
-## Trusted by
-
-Companies using HttpClient.Resilience in production:
-
-[![planfact.io](https://planfact.io/build/images/icons/72.png)](https://planfact.io)
-
-_Using HttpClient.Resilience in production? [Let us know](https://github.com/akrisanov/HttpClient.Resilience/issues) and we'll add your company here!_
 
 ## Contributing
 
-Contributions are encouraged! Please open issues or pull requests on the GitHub repository.
-Follow the established code style and include tests for new features or bug fixes.
-
-**Keywords:** dotnet, csharp, httpclient, polly, retry, circuit breaker, resilience, aspnetcore
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
