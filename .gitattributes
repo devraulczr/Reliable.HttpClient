@@ -1,1 +1,7 @@
 * text=auto eol=lf
+
+# Documentation assets
+docs/assets/logos/*.png linguist-generated=false
+
+# Treat logo files as binary to prevent unnecessary diffs
+docs/assets/logos/*.png binary

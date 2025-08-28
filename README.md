@@ -54,9 +54,9 @@ builder.Services.AddHttpClient<WeatherApiClient>()
 
 ## Trusted By
 
-[![PlanFact](https://planfact.io/assets/logo/planfact-logo-light.svg)](https://planfact.io)
+Organizations using HttpClient.Resilience in production:
 
-*Add your company here by creating a pull request*
+[![PlanFact](docs/assets/logos/planfact.png)](https://planfact.io)
 
 ## Documentation
 
