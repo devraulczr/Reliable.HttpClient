@@ -2,7 +2,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
-[![Build Status](https://github.com/akrisanov/HttpClient.Resilience/workflows/CI/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions)
+[![Build Status](https://github.com/akrisanov/HttpClient.Resilience/workflows/Build%20%26%20Test/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions)
 [![License](https://img.shields.io/github/license/akrisanov/HttpClient.Resilience)](LICENSE)
 
 A lightweight, easy-to-use resilience library for HttpClient with built-in retry policies and circuit breakers.
