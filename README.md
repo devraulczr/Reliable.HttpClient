@@ -2,7 +2,8 @@
 
 [![NuGet](https://img.shields.io/nuget/v/HttpClient.Resilience.svg)](https://www.nuget.org/packages/HttpClient.Resilience)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/HttpClient.Resilience.svg)](https://www.nuget.org/packages/HttpClient.Resilience)
-[![Build Status](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/build.yml/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions)
+[![Build & Test](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/ci.yml/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/ci.yml)
+[![Release](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/release.yml/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## Overview
@@ -11,8 +12,11 @@ HttpClient.Resilience is a **configuration-first wrapper** around Polly that pro
 and simplified setup for common HttpClient resilience scenarios. It focuses on developer experience
 for typical retry and circuit breaker patterns while maintaining the power of Polly underneath.
 
-Perfect for teams who want **resilient HTTP clients with minimal boilerplate** and prefer
-declarative configuration over imperative policy building.
+## Supported Frameworks
+
+- .NET 6 (LTS)
+- .NET 8 (LTS)
+- .NET 9 (Current)
 
 ## When to use this library
 

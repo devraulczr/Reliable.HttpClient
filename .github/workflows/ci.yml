@@ -1,4 +1,4 @@
-name: ci
+name: Build & Test
 
 on:
   push:
@@ -18,10 +18,22 @@ jobs:
             6.0.x
             8.0.x
             9.0.x
-            10.0.x
+          cache: true
+
       - name: Restore
         run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
+
       - name: Test
-        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/*.trx
+            **/TestResults/*/coverage.cobertura.xml
