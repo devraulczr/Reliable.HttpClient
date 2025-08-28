@@ -16,6 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clean
+        run: |
+          dotnet clean HttpClient.Resilience.sln -c Release || true
+          find src -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} + || true
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -41,6 +46,17 @@ jobs:
             -p:ContinuousIntegrationBuild=true \
             -p:Version=${{ steps.ver.outputs.version }} \
             --no-build
+
+      - name: Verify package exists
+        run: |
+          compgen -G "src/HttpClient.Resilience/bin/Release/*.nupkg" > /dev/null \
+            || (echo "No .nupkg produced" >&2; exit 1)
+
+      - name: List packaged artifacts
+        run: |
+          echo "Listing packed files:" && ls -la src/HttpClient.Resilience/bin/Release || true
+          echo "NUPKG:" && ls -1 src/HttpClient.Resilience/bin/Release/*.nupkg || echo "No .nupkg found"
+          echo "SNUPKG:" && ls -1 src/HttpClient.Resilience/bin/Release/*.snupkg || echo "No .snupkg found"
 
       - name: Archive package
         uses: actions/upload-artifact@v4
