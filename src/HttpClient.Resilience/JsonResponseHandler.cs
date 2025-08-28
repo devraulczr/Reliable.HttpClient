@@ -11,7 +11,7 @@ namespace HttpClient.Resilience;
 public class JsonResponseHandler<TResponse>(ILogger<JsonResponseHandler<TResponse>> logger)
     : HttpResponseHandlerBase<TResponse>(logger)
 {
-    private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+    private static readonly JsonSerializerOptions s_defaultJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true
@@ -43,7 +43,7 @@ public class JsonResponseHandler<TResponse>(ILogger<JsonResponseHandler<TRespons
 
         try
         {
-            TResponse? result = JsonSerializer.Deserialize<TResponse>(content, DefaultJsonOptions) ?? throw new HttpRequestException("JSON deserialization returned null");
+            TResponse? result = JsonSerializer.Deserialize<TResponse>(content, s_defaultJsonOptions) ?? throw new HttpRequestException("JSON deserialization returned null");
             return result;
         }
         catch (JsonException ex)

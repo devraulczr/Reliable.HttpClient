@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 
-using HttpClientType = System.Net.Http.HttpClient;
-
 namespace HttpClient.Resilience;
 
 /// <summary>
@@ -42,7 +40,7 @@ public static class HttpClientExtensions
     /// <returns>HTTP client builder for method chaining</returns>
     public static IHttpClientBuilder ConfigureResilientClient<TClient, TOptions>(
         this IHttpClientBuilder builder,
-        Action<TOptions, HttpClientType>? configureClient = null)
+        Action<TOptions, System.Net.Http.HttpClient>? configureClient = null)
         where TClient : class
         where TOptions : HttpClientOptions
     {
@@ -64,7 +62,7 @@ public static class HttpClientExtensions
     public static IHttpClientBuilder ConfigureResilientClient<TOptions>(
         this IHttpClientBuilder builder,
         string loggerName,
-        Action<TOptions, HttpClientType>? configureClient = null)
+        Action<TOptions, System.Net.Http.HttpClient>? configureClient = null)
         where TOptions : HttpClientOptions
     {
         return builder
@@ -79,8 +77,8 @@ public static class HttpClientExtensions
     /// </summary>
     private static void ConfigureHttpClientCore<TOptions>(
         IServiceProvider serviceProvider,
-        HttpClientType client,
-        Action<TOptions, HttpClientType>? configureClient)
+        System.Net.Http.HttpClient client,
+        Action<TOptions, System.Net.Http.HttpClient>? configureClient)
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;

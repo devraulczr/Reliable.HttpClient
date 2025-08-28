@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-using HttpClientType = System.Net.Http.HttpClient;
-
 namespace HttpClient.Resilience.Tests;
 
 public class HttpClientExtensionsTests
@@ -47,7 +45,7 @@ public class HttpClientExtensionsTests
         IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
         // Act
-        HttpClientType httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
+        System.Net.Http.HttpClient httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
 
         // Assert
         httpClient.BaseAddress.Should().Be(new Uri("https://api.test.com"));
@@ -74,7 +72,7 @@ public class HttpClientExtensionsTests
         IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
         // Act
-        HttpClientType httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
+        System.Net.Http.HttpClient httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
 
         // Assert
         httpClient.BaseAddress.Should().BeNull();
@@ -97,7 +95,7 @@ public class HttpClientExtensionsTests
         IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
         // Act
-        HttpClientType httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
+        System.Net.Http.HttpClient httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
 
         // Assert
         httpClient.DefaultRequestHeaders.Contains("User-Agent").Should().BeFalse();
@@ -120,7 +118,7 @@ public class HttpClientExtensionsTests
         IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
         // Act
-        HttpClientType httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
+        System.Net.Http.HttpClient httpClient = httpClientFactory.CreateClient(typeof(TestHttpClient).Name);
 
         // Assert
         var apiKeyHeader = httpClient.DefaultRequestHeaders.GetValues("X-API-Key").FirstOrDefault();
@@ -144,7 +142,7 @@ public class HttpClientExtensionsTests
         IHttpClientFactory httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
         // Act
-        HttpClientType httpClient = httpClientFactory.CreateClient(clientName);
+        System.Net.Http.HttpClient httpClient = httpClientFactory.CreateClient(clientName);
 
         // Assert
         httpClient.BaseAddress.Should().Be(new Uri("https://api.test.com"));
@@ -256,9 +254,9 @@ public class TestHttpClientOptions : HttpClientOptions
     }
 }
 
-public class TestHttpClient(HttpClientType httpClient)
+public class TestHttpClient(System.Net.Http.HttpClient httpClient)
 {
-    private readonly HttpClientType _httpClient = httpClient;
+    private readonly System.Net.Http.HttpClient _httpClient = httpClient;
 
     public async Task<HttpResponseMessage> GetAsync(string requestUri)
     {
