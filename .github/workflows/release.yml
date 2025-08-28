@@ -63,10 +63,15 @@ jobs:
             --skip-duplicate
 
       - name: Publish symbols to NuGet
-        run: dotnet nuget push src/HttpClient.Resilience/bin/Release/*.snupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
+        run: |
+          if compgen -G "src/HttpClient.Resilience/bin/Release/*.snupkg" > /dev/null; then
+            dotnet nuget push src/HttpClient.Resilience/bin/Release/*.snupkg \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          else
+            echo "No snupkg files found, skipping symbol package push."
+          fi
 
       - name: Publish to GitHub Packages
         run: |
