@@ -197,13 +197,8 @@ public class HttpResponseHandlerBaseTests
 
         protected override bool TryComputeLength(out long length)
         {
-            length = -1;
+            length = 0;
             return false;
-        }
-
-        protected override Task<Stream> CreateContentReadStreamAsync()
-        {
-            throw new InvalidOperationException("Simulated read error");
         }
     }
 }

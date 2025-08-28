@@ -267,74 +267,23 @@ public class TestHttpClient(System.Net.Http.HttpClient httpClient)
 // Mock HTTP Message Handler for testing
 public class MockHttpMessageHandler : HttpMessageHandler
 {
-    private readonly Queue<HttpResponseMessage> _responses = new();
-    private HttpResponseMessage? _defaultResponse;
+    private HttpStatusCode _statusCode = HttpStatusCode.OK;
+    private string _content = string.Empty;
     public int RequestCount { get; private set; }
 
-    public MockHttpMessageHandler SetupSequence()
+    public MockHttpMessageHandler ReturnsResponse(HttpStatusCode statusCode, string content = "")
     {
-        return this;
-    }
-
-    public MockHttpMessageHandler ReturnsResponse(HttpStatusCode statusCode, string? content = null)
-    {
-        var response = new HttpResponseMessage(statusCode)
-        {
-            Content = content != null ? new StringContent(content) : new StringContent("")
-        };
-
-        if (_responses.Count == 0 && _defaultResponse == null)
-        {
-            // If this is the first call, add to queue
-            _responses.Enqueue(response);
-        }
-        else
-        {
-            // If there are already responses, add to queue
-            _responses.Enqueue(response);
-        }
-        return this;
-    }
-
-    public MockHttpMessageHandler ReturnsResponse(HttpStatusCode statusCode)
-    {
-        _defaultResponse = new HttpResponseMessage(statusCode)
-        {
-            Content = new StringContent("")
-        };
+        _statusCode = statusCode;
+        _content = content;
         return this;
     }
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         RequestCount++;
-
-        if (_responses.Count > 0)
+        return Task.FromResult(new HttpResponseMessage(_statusCode)
         {
-            return Task.FromResult(_responses.Dequeue());
-        }
-
-        if (_defaultResponse != null)
-        {
-            return Task.FromResult(new HttpResponseMessage(_defaultResponse.StatusCode)
-            {
-                Content = new StringContent("")
-            });
-        }
-
-        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            while (_responses.Count > 0)
-            {
-                _responses.Dequeue()?.Dispose();
-            }
-            _defaultResponse?.Dispose();
-        }
-        base.Dispose(disposing);
+            Content = new StringContent(_content)
+        });
     }
 }

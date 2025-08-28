@@ -35,6 +35,7 @@ for typical retry and circuit breaker patterns while maintaining the power of Po
 - Configurable `HttpClient` options
 - Seamless integration with dependency injection (DI)
 - Base response handler abstraction for extensibility
+- **Configuration validation** to prevent common misconfigurations
 
 ## Installation
 
@@ -181,6 +182,43 @@ var handler = serviceProvider.GetRequiredService<JsonResponseHandler<WeatherData
 var weatherData = await handler.HandleAsync(response);
 ```
 
+## Configuration Validation
+
+HttpClient.Resilience automatically validates configuration at registration time to help catch common misconfigurations early. Validation occurs when you call `.AddResilience()` and will throw
+`ArgumentException` with descriptive messages for invalid settings.
+
+### Validated Settings
+
+**HTTP Client Settings:**
+
+- `TimeoutSeconds` must be greater than 0
+- `BaseUrl` must be a valid HTTP/HTTPS absolute URI (when specified)
+
+**Retry Settings:**
+
+- `MaxRetries` cannot be negative
+- `BaseDelay` must be greater than zero
+- `MaxDelay` must be greater than zero
+- `BaseDelay` cannot be greater than `MaxDelay`
+- `JitterFactor` must be between 0.0 and 1.0
+
+**Circuit Breaker Settings:**
+
+- `FailuresBeforeOpen` must be greater than 0
+- `OpenDuration` must be greater than zero
+
+### Example Error Messages
+
+```csharp
+// This will throw ArgumentException at registration time
+services.AddHttpClient("api")
+    .AddResilience(options =>
+    {
+        options.Retry.MaxRetries = -1; // Invalid!
+    });
+// → "MaxRetries cannot be negative (Parameter 'MaxRetries')"
+```
+
 ## Telemetry & Logging
 
 HttpClient.Resilience currently uses `ILogger` for detailed logging of retries, circuit breaker
@@ -221,9 +259,12 @@ builder.Services.AddOpenTelemetry()
 - Structured logging with correlation IDs
 - Health checks for circuit breaker and overall system state
 - OpenTelemetry metrics and tracing integration
-- Configuration validation
 - Benchmarks and performance analysis
 - Bulkhead isolation policy
+
+### ✅ Recently completed
+
+- **Configuration validation** - Validates options at registration time to prevent common misconfigurations
 
 Contributions and feedback are welcome to help shape the API and features.
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
+using Polly.Retry;
 
 namespace HttpClient.Resilience;
 
@@ -25,6 +26,9 @@ public static class HttpClientExtensions
         var options = new HttpClientOptions();
         configureOptions?.Invoke(options);
 
+        // Validate configuration
+        options.Validate();
+
         return builder
             .AddPolicyHandler(CreateRetryPolicy(options))
             .AddPolicyHandler(CreateCircuitBreakerPolicy(options));
@@ -45,8 +49,7 @@ public static class HttpClientExtensions
         where TOptions : HttpClientOptions
     {
         return builder
-            .ConfigureHttpClient((serviceProvider, client) =>
-                ConfigureHttpClientCore(serviceProvider, client, configureClient))
+            .ConfigureHttpClient((serviceProvider, client) => ConfigureHttpClientCore(serviceProvider, client, configureClient))
             .AddPolicyHandler((serviceProvider, request) => CreateRetryPolicy<TClient, TOptions>(serviceProvider))
             .AddPolicyHandler((serviceProvider, request) => CreateCircuitBreakerPolicy<TClient, TOptions>(serviceProvider));
     }
@@ -66,8 +69,7 @@ public static class HttpClientExtensions
         where TOptions : HttpClientOptions
     {
         return builder
-            .ConfigureHttpClient((serviceProvider, client) =>
-                ConfigureHttpClientCore(serviceProvider, client, configureClient))
+            .ConfigureHttpClient((serviceProvider, client) => ConfigureHttpClientCore(serviceProvider, client, configureClient))
             .AddPolicyHandler((serviceProvider, request) => CreateRetryPolicyNamed<TOptions>(serviceProvider, loggerName))
             .AddPolicyHandler((serviceProvider, request) => CreateCircuitBreakerPolicyNamed<TOptions>(serviceProvider, loggerName));
     }
@@ -82,6 +84,9 @@ public static class HttpClientExtensions
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+
+        // Validate configuration
+        options.Validate();
 
         if (!string.IsNullOrWhiteSpace(options.BaseUrl))
         {
@@ -98,7 +103,7 @@ public static class HttpClientExtensions
         configureClient?.Invoke(options, client);
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> CreateRetryPolicy(HttpClientOptions options)
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(HttpClientOptions options)
     {
         var random = new Random();
 
@@ -139,28 +144,36 @@ public static class HttpClientExtensions
                 durationOfBreak: options.CircuitBreaker.OpenDuration);
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> CreateRetryPolicy<TClient, TOptions>(IServiceProvider serviceProvider)
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy<TClient, TOptions>(IServiceProvider serviceProvider)
         where TClient : class
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+
+        // Validate configuration
+        options.Validate();
+
         ILogger<TClient> logger = serviceProvider.GetRequiredService<ILogger<TClient>>();
 
         return CreateRetryPolicyCore(options, logger, typeof(TClient).Name);
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> CreateRetryPolicyNamed<TOptions>(
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicyNamed<TOptions>(
         IServiceProvider serviceProvider, string loggerName)
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+
+        // Validate configuration
+        options.Validate();
+
         ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         ILogger logger = loggerFactory.CreateLogger(loggerName);
 
         return CreateRetryPolicyCore(options, logger, loggerName);
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> CreateRetryPolicyCore(
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicyCore(
         HttpClientOptions options,
         ILogger logger,
         string clientName)
@@ -206,6 +219,10 @@ public static class HttpClientExtensions
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+
+        // Validate configuration
+        options.Validate();
+
         ILogger<TClient> logger = serviceProvider.GetRequiredService<ILogger<TClient>>();
 
         return CreateCircuitBreakerPolicyCore(options, logger, typeof(TClient).Name);
@@ -216,6 +233,10 @@ public static class HttpClientExtensions
         where TOptions : HttpClientOptions
     {
         TOptions options = serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+
+        // Validate configuration
+        options.Validate();
+
         ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         ILogger logger = loggerFactory.CreateLogger(loggerName);
 
