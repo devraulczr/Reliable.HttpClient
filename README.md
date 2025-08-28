@@ -249,7 +249,7 @@ builder.Services.AddOpenTelemetry()
 
 ## Roadmap / Status
 
-- Current version: pre-release (1.0.0-alpha1)
+- Current version: pre-release (1.0.0-alpha3)
 
 ### Planned features
 
@@ -267,6 +267,14 @@ builder.Services.AddOpenTelemetry()
 - **Configuration validation** - Validates options at registration time to prevent common misconfigurations
 
 Contributions and feedback are welcome to help shape the API and features.
+
+## Trusted by
+
+Companies using HttpClient.Resilience in production:
+
+[![planfact.io](https://planfact.io/build/images/icons/72.png)](https://planfact.io)
+
+_Using HttpClient.Resilience in production? [Let us know](https://github.com/akrisanov/HttpClient.Resilience/issues) and we'll add your company here!_
 
 ## Contributing
 

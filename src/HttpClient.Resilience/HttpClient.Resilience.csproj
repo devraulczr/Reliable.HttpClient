@@ -3,9 +3,10 @@
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>HttpClient.Resilience</AssemblyName>
     <PackageId>HttpClient.Resilience</PackageId>
-    <Version>1.0.0-alpha1</Version>
-    <PackageReleaseNotes>Initial alpha release with retry policies, circuit breaker,
-      HttpClientOptions, and base response handler.</PackageReleaseNotes>
+    <Version>1.0.0-alpha3</Version>
+    <PackageReleaseNotes>Added configuration validation, performance improvements with specific
+      return types,
+      and suppressed .NET 6.0 compatibility warnings.</PackageReleaseNotes>
     <Authors>Andrey Krisanov</Authors>
     <Company></Company>
     <Description>Lightweight resilience helpers (retry with jitter, circuit breaker) and response
@@ -22,6 +23,9 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DebugType>portable</DebugType>
+    <!-- Suppress warnings about Microsoft.Extensions.* 9.x not officially supporting .NET 6.0 -->
+    <!-- These packages work fine with .NET 6.0 in practice -->
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <ItemGroup>
