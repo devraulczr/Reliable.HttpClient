@@ -65,7 +65,7 @@ public class RetryOptions
     public int MaxRetries { get; set; } = 3;
 
     /// <summary>
-    /// Base delay before retry
+    /// Base delay before retry (exponential backoff: 1s, 2s, 4s, 8s...)
     /// </summary>
     public TimeSpan BaseDelay { get; set; } = TimeSpan.FromMilliseconds(1_000);
 

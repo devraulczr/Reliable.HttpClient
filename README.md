@@ -108,11 +108,11 @@ Organizations using Reliable.HttpClient in production:
 
 ## Documentation
 
-- 📚 [Getting Started Guide](docs/getting-started.md) - Quick setup and basic usage
-- ⚙️ [Configuration Reference](docs/configuration.md) - Complete options reference
-- 🚀 [Advanced Usage](docs/advanced-usage.md) - Advanced patterns and techniques
-- � [HTTP Caching Guide](docs/caching.md) - Complete caching documentation
-- �💡 [Common Scenarios](docs/examples/common-scenarios.md) - Real-world examples
+- [Getting Started Guide](docs/getting-started.md) - Quick setup and basic usage
+- [Configuration Reference](docs/configuration.md) - Complete options reference
+- [Advanced Usage](docs/advanced-usage.md) - Advanced patterns and techniques
+- [HTTP Caching Guide](docs/caching.md) - Complete caching documentation
+- [Common Scenarios](docs/examples/common-scenarios.md) - Real-world examples
 
 ## Key Features
 

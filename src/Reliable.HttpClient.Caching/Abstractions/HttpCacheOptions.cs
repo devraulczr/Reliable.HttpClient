@@ -11,7 +11,7 @@ public class HttpCacheOptions
     public TimeSpan DefaultExpiry { get; set; } = TimeSpan.FromMinutes(5);
 
     /// <summary>
-    /// Maximum number of items to cache (for memory cache)
+    /// Maximum number of items to cache (for memory cache). Helps prevent memory leaks.
     /// </summary>
     public int? MaxCacheSize { get; set; } = 1_000;
 
@@ -21,13 +21,13 @@ public class HttpCacheOptions
     public ICacheKeyGenerator KeyGenerator { get; set; } = new DefaultCacheKeyGenerator();
 
     /// <summary>
-    /// HTTP status codes that should be cached
+    /// HTTP status codes that should be cached (idempotent responses only)
     /// </summary>
     public HashSet<System.Net.HttpStatusCode> CacheableStatusCodes { get; set; } =
     [
-        System.Net.HttpStatusCode.OK,
-        System.Net.HttpStatusCode.NotModified,
-        System.Net.HttpStatusCode.PartialContent
+        System.Net.HttpStatusCode.OK,             // 200 - Standard success
+        System.Net.HttpStatusCode.NotModified,    // 304 - Not modified
+        System.Net.HttpStatusCode.PartialContent  // 206 - Partial content
     ];
 
     /// <summary>
