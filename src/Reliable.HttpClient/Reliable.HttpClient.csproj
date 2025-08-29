@@ -3,10 +3,11 @@
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>Reliable.HttpClient</AssemblyName>
     <PackageId>Reliable.HttpClient</PackageId>
-    <Version>1.0.0-alpha3</Version>
-    <PackageReleaseNotes>Added configuration validation, performance improvements with specific
-      return types,
-      and suppressed .NET 6.0 compatibility warnings.</PackageReleaseNotes>
+    <Version>1.0.0-alpha1</Version>
+    <PackageReleaseNotes>Initial alpha release of Reliable.HttpClient (renamed from
+      HttpClient.Resilience).
+      Features: retry with exponential backoff and jitter, circuit breaker, and HTTP response
+      handling.</PackageReleaseNotes>
     <Authors>Andrey Krisanov</Authors>
     <Company></Company>
     <Description>Lightweight resilience helpers (retry with jitter, circuit breaker) and response

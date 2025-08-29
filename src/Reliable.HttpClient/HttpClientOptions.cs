@@ -18,7 +18,7 @@ public class HttpClientOptions
     /// <summary>
     /// User-Agent for HTTP requests
     /// </summary>
-    public string UserAgent { get; set; } = "Reliable.HttpClient/1.0";
+    public string UserAgent { get; set; } = "Reliable.HttpClient/1.0.0-alpha1";
 
     /// <summary>
     /// Retry policy configuration
