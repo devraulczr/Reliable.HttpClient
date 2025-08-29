@@ -3,8 +3,8 @@
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>Reliable.HttpClient.Caching</AssemblyName>
     <PackageId>Reliable.HttpClient.Caching</PackageId>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>🐛 Bug Fix Release v1.0.1
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>🐛 Bug Fix Release v1.0.2
 
       Fixed cache preset expiry times not being respected:
       • AddMediumTermCache now correctly uses 10 minutes (was using 5 minutes)
