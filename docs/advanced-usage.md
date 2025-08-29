@@ -4,26 +4,93 @@ Learn advanced techniques and patterns for using Reliable.HttpClient in complex 
 
 ## Multiple Named HttpClients
 
-Configure different resilience policies for different services:
+Configure different resilience policies for different services using presets and custom configuration:
 
 ```csharp
-// Fast internal service - minimal resilience
+// Fast internal service - use preset
 services.AddHttpClient("internal-api", c => c.BaseAddress = new Uri("http://internal-api"))
-    .AddResilience(options =>
+    .AddResilience(HttpClientPresets.FastInternalApi());
+
+// External service - use preset with customization
+services.AddHttpClient("external-api", c => c.BaseAddress = new Uri("https://external-api.com"))
+    .AddResilience(HttpClientPresets.SlowExternalApi(), options =>
     {
-        options.Retry.MaxRetries = 1;
-        options.CircuitBreaker.FailuresBeforeOpen = 10;
+        // Customize the preset
+        options.Retry.MaxRetries = 3; // Override preset's 2 retries
     });
 
-// External service - aggressive resilience
-services.AddHttpClient("external-api", c => c.BaseAddress = new Uri("https://external-api.com"))
-    .AddResilience(options =>
+// File downloads - specific preset
+services.AddHttpClient("file-downloads")
+    .AddResilience(HttpClientPresets.FileDownload());
+
+// Custom configuration with builder pattern
+services.AddHttpClient("custom-api")
+    .AddResilience(builder => builder
+        .WithTimeout(TimeSpan.FromSeconds(45))
+        .WithRetry(retry => retry
+            .WithMaxRetries(4)
+            .WithBaseDelay(TimeSpan.FromMilliseconds(800))
+            .WithJitter(0.4))
+        .WithCircuitBreaker(cb => cb
+            .WithFailureThreshold(7)
+            .WithOpenDuration(TimeSpan.FromMinutes(3))));
+```
+
+## Configuration Patterns by Scenario
+
+### High-Performance Internal APIs
+
+```csharp
+services.AddHttpClient<OrderService>()
+    .AddResilience(HttpClientPresets.FastInternalApi())
+    .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
     {
-        options.Retry.MaxRetries = 5;
-        options.Retry.BaseDelay = TimeSpan.FromSeconds(1);
-        options.CircuitBreaker.FailuresBeforeOpen = 3;
-        options.CircuitBreaker.OpenDuration = TimeSpan.FromMinutes(5);
+        MaxConnectionsPerServer = 100,
+        PooledConnectionLifetime = TimeSpan.FromMinutes(10)
     });
+```
+
+### External Partner APIs
+
+```csharp
+services.AddHttpClient<PartnerApiClient>()
+    .AddResilience(builder => builder
+        .WithTimeout(TimeSpan.FromMinutes(2))
+        .WithRetry(retry => retry
+            .WithMaxRetries(3)
+            .WithBaseDelay(TimeSpan.FromSeconds(3))
+            .WithJitter(0.5)) // Higher jitter for external APIs
+        .WithCircuitBreaker(cb => cb
+            .WithFailureThreshold(5)
+            .WithOpenDuration(TimeSpan.FromMinutes(10)))); // Longer recovery time
+```
+
+### Real-time Data APIs
+
+```csharp
+services.AddHttpClient<RealTimeDataClient>()
+    .AddResilience(HttpClientPresets.RealTimeApi())
+    .ConfigureHttpClient(client =>
+    {
+        client.DefaultRequestHeaders.Add("X-Real-Time", "true");
+    });
+```
+
+### File Upload/Download Services
+
+```csharp
+// Download client
+services.AddHttpClient<FileDownloadClient>()
+    .AddResilience(HttpClientPresets.FileDownload());
+
+// Upload client (custom configuration)
+services.AddHttpClient<FileUploadClient>()
+    .AddResilience(builder => builder
+        .WithTimeout(TimeSpan.FromMinutes(15))
+        .WithRetry(retry => retry
+            .WithMaxRetries(2)
+            .WithBaseDelay(TimeSpan.FromSeconds(5)))
+        .WithoutCircuitBreaker()); // No circuit breaker for uploads
 ```
 
 ## Typed HttpClients
@@ -299,20 +366,98 @@ public class WeatherService
 
 ### Bulkhead Pattern
 
-Isolate different types of operations:
+Isolate different types of operations using presets:
 
 ```csharp
 // Separate clients for different operation types
 services.AddHttpClient("read-operations")
-    .AddResilience(options =>
-    {
-        options.Retry.MaxRetries = 5; // More aggressive for reads
-    });
+    .AddResilience(HttpClientPresets.FastInternalApi()); // Aggressive for reads
 
 services.AddHttpClient("write-operations")
-    .AddResilience(options =>
+    .AddResilience(builder => builder
+        .WithRetry(retry => retry.WithMaxRetries(1)) // Conservative for writes
+        .WithCircuitBreaker(cb => cb.WithFailureThreshold(3)));
+
+services.AddHttpClient("auth-operations")
+    .AddResilience(HttpClientPresets.AuthenticationApi());
+```
+
+## Advanced Builder Patterns
+
+### Conditional Configuration
+
+```csharp
+public static class ServiceCollectionExtensions
+{
+    public static IHttpClientBuilder AddEnvironmentBasedResilience(
+        this IHttpClientBuilder builder,
+        IWebHostEnvironment environment)
     {
-        options.Retry.MaxRetries = 1; // Conservative for writes
-        options.CircuitBreaker.FailuresBeforeOpen = 3;
-    });
+        if (environment.IsDevelopment())
+        {
+            // Fast-fail in development
+            return builder.AddResilience(b => b
+                .WithRetry(retry => retry.WithMaxRetries(1))
+                .WithCircuitBreaker(cb => cb.WithFailureThreshold(2)));
+        }
+
+        if (environment.IsProduction())
+        {
+            // Use production preset
+            return builder.AddResilience(HttpClientPresets.SlowExternalApi());
+        }
+
+        // Default for staging
+        return builder.AddResilience();
+    }
+}
+
+// Usage
+services.AddHttpClient<MyApiClient>()
+    .AddEnvironmentBasedResilience(environment);
+```
+
+### Configuration Composition
+
+```csharp
+public static class ResiliencePresets
+{
+    public static HttpClientOptions CreateCustomPreset()
+    {
+        return new HttpClientOptionsBuilder()
+            .WithTimeout(TimeSpan.FromSeconds(30))
+            .WithRetry(retry => retry
+                .WithMaxRetries(3)
+                .WithBaseDelay(TimeSpan.FromSeconds(1))
+                .WithJitter(0.25))
+            .WithCircuitBreaker(cb => cb
+                .WithFailureThreshold(5)
+                .WithOpenDuration(TimeSpan.FromMinutes(1)))
+            .Build();
+    }
+
+    public static HttpClientOptions ModifyPreset(HttpClientOptions basePreset, Action<HttpClientOptionsBuilder> modify)
+    {
+        var builder = new HttpClientOptionsBuilder()
+            .WithTimeout(TimeSpan.FromSeconds(basePreset.TimeoutSeconds))
+            .WithRetry(retry => retry
+                .WithMaxRetries(basePreset.Retry.MaxRetries)
+                .WithBaseDelay(basePreset.Retry.BaseDelay)
+                .WithJitter(basePreset.Retry.JitterFactor))
+            .WithCircuitBreaker(cb => cb
+                .WithFailureThreshold(basePreset.CircuitBreaker.FailuresBeforeOpen)
+                .WithOpenDuration(basePreset.CircuitBreaker.OpenDuration));
+
+        modify(builder);
+        return builder.Build();
+    }
+}
+
+// Usage
+var customPreset = ResiliencePresets.ModifyPreset(
+    HttpClientPresets.SlowExternalApi(),
+    builder => builder.WithTimeout(TimeSpan.FromMinutes(5)));
+
+services.AddHttpClient("long-running-api")
+    .AddResilience(customPreset);
 ```

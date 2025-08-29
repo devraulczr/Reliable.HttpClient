@@ -1,8 +1,12 @@
-# Quick Start Guide
+# Getting Started Guide
 
-Get up and running with Reliable.HttpClient in minutes. Choose between core resilience features or the complete resilience + caching solution.
+Detailed setup guide for Reliable.HttpClient with step-by-step explanations.
+
+> 🚀 **Quick Start**: For fastest setup, see [README Quick Start](../README.md#quick-start)
 
 ## Installation
+
+Choose the packages you need:
 
 ### Core Resilience Only
 
@@ -10,73 +14,94 @@ Get up and running with Reliable.HttpClient in minutes. Choose between core resi
 dotnet add package Reliable.HttpClient
 ```
 
-### Resilience + Caching
+**Includes**: Retry policies, circuit breaker, smart error handling
+
+### Core + Caching
 
 ```bash
-# Install both packages
 dotnet add package Reliable.HttpClient
 dotnet add package Reliable.HttpClient.Caching
 ```
 
-## Basic Setup
+**Includes**: Everything above + HTTP response caching
 
-### Default Configuration (Core Resilience)
+## Step-by-Step Setup
+
+### Step 1: Basic Resilience
 
 ```csharp
-builder.Services.AddHttpClient("myapi", c =>
+// Minimal setup - works out of the box
+builder.Services.AddHttpClient<MyApiClient>(c =>
 {
     c.BaseAddress = new Uri("https://api.example.com");
 })
-.AddResilience(); // Uses built-in defaults - no configuration needed!
+.AddResilience(); // Zero configuration needed!
 ```
 
-### Adding Caching to Resilience
+**What this gives you:**
+
+- Automatic retries (3 attempts with exponential backoff)
+- Circuit breaker (opens after 5 failures)
+- Smart error handling (5xx, timeouts, rate limits)
+
+### Step 2: Add Caching (Optional)
 
 ```csharp
-// Add memory cache service
+// Add memory cache service first
 services.AddMemoryCache();
 
-// Configure HttpClient with resilience and caching
-services.AddHttpClient<WeatherApiClient>(c =>
+// Then add caching to your HttpClient
+services.AddHttpClient<MyApiClient>(c =>
 {
-    c.BaseAddress = new Uri("https://api.weather.com");
+    c.BaseAddress = new Uri("https://api.example.com");
 })
-.AddResilience()  // Retry + Circuit breaker
-.AddMemoryCache<WeatherResponse>(options =>
+.AddResilience()
+.AddMemoryCache<MyResponse>(options =>
 {
     options.DefaultExpiry = TimeSpan.FromMinutes(5);
 });
 ```
 
-### Custom Configuration
+**Additional benefits:**
+
+- Automatic response caching
+- SHA256-based cache keys (collision-resistant)
+- Manual cache invalidation support
+
+### Step 3: Custom Configuration (Optional)
+
+Need different settings? Multiple options available:
 
 ```csharp
-builder.Services.AddHttpClient<WeatherApiClient>()
-    .AddResilience(options =>
-    {
-        // Only configure what you need to change
-        options.Retry.MaxRetries = 5; // Default: 3
-        options.CircuitBreaker.FailuresBeforeOpen = 10; // Default: 5
-        // All other settings use sensible defaults
-    });
+// Option 1: Simple overrides
+.AddResilience(options => options.Retry.MaxRetries = 5)
+
+// Option 2: Fluent builder
+.AddResilience(builder => builder.WithRetry(r => r.WithMaxRetries(5)))
+
+// Option 3: Ready-made presets
+.AddResilience(HttpClientPresets.SlowExternalApi())
 ```
 
-### Using the Client
+> 📖 **Complete Configuration Guide**: See [Configuration Reference](configuration.md) for all options and presets
+
+## Using Your Client
+
+## Example: Complete Service
 
 ```csharp
-using System.Text.Json;
-
 public class WeatherService
 {
     private readonly HttpClient _httpClient;
 
     public WeatherService(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClientFactory.CreateClient("myapi");
+        _httpClient = httpClientFactory.CreateClient<WeatherApiClient>();
     }
 
     public async Task<WeatherData> GetWeatherAsync(string city)
     {
+        // This call now has retry, circuit breaker, and caching!
         var response = await _httpClient.GetAsync($"/weather?city={city}");
         response.EnsureSuccessStatusCode();
 
@@ -85,47 +110,20 @@ public class WeatherService
 }
 ```
 
-### Using the Cached Client
+**That's it!** Your HTTP client is now production-ready with resilience and caching.
 
-```csharp
-public class WeatherService
-{
-    private readonly CachedHttpClient<WeatherResponse> _cachedClient;
+## What's Included
 
-    public WeatherService(CachedHttpClient<WeatherResponse> cachedClient)
-    {
-        _cachedClient = cachedClient;
-    }
-
-    public async Task<WeatherResponse> GetWeatherAsync(string city)
-    {
-        // This call will be cached automatically
-        var response = await _cachedClient.GetAsync($"/weather?city={city}");
-        return response;
-    }
-}
-```
-
-## What You Get Out of the Box
-
-### Core Resilience Features
-
-- **Retry Policy**: 3 attempts with exponential backoff + jitter
-- **Circuit Breaker**: Opens after 5 consecutive failures, stays open for 1 minute
-- **Smart Error Handling**: Retries on 5xx, 408, 429, and network errors
-- **Production Ready**: Used by companies in production environments
-
-### Caching Features (with Reliable.HttpClient.Caching)
-
-- **Automatic Caching**: Cache HTTP responses based on configurable rules
-- **Smart Cache Keys**: SHA256-based generation with collision prevention
-- **Multiple Providers**: Memory cache and custom cache providers
-- **Cache Management**: Manual invalidation and clearing
-- **Security**: Cryptographic hashing prevents cache poisoning
+- **3 retry attempts** with exponential backoff + jitter
+- **Circuit breaker** opens after 5 failures for 1 minute
+- **Smart error handling** for 5xx, timeouts, rate limits
+- **Response caching** with 5-minute default expiry (if enabled)
+- **Configuration validation** at startup
+- **Zero overhead** when not needed
 
 ## Next Steps
 
-- [Learn about configuration options](configuration.md)
-- [Explore caching features](caching.md)
-- [Explore advanced usage patterns](advanced-usage.md)
-- [See real-world examples](examples/common-scenarios.md)
+- **Custom Configuration**: See [Configuration Reference](configuration.md)
+- **Advanced Patterns**: See [Advanced Usage](advanced-usage.md)
+- **Caching Details**: See [HTTP Caching Guide](caching.md)
+- **Real Examples**: See [Common Scenarios](examples/common-scenarios.md)

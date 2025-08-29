@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using Polly;
 using Polly.Retry;
 
@@ -32,6 +33,45 @@ public static class HttpClientExtensions
         return builder
             .AddPolicyHandler(CreateRetryPolicy(options))
             .AddPolicyHandler(CreateCircuitBreakerPolicy(options));
+    }
+
+    /// <summary>
+    /// Configures HTTP client with resilience policies using fluent builder
+    /// </summary>
+    /// <param name="builder">HTTP client builder</param>
+    /// <param name="configureOptions">Action to configure resilience options using builder</param>
+    /// <returns>HTTP client builder for method chaining</returns>
+    public static IHttpClientBuilder AddResilience(
+        this IHttpClientBuilder builder,
+        Action<HttpClientOptionsBuilder> configureOptions)
+    {
+        var optionsBuilder = new HttpClientOptionsBuilder();
+        configureOptions(optionsBuilder);
+        var options = optionsBuilder.Build();
+
+        return builder
+            .AddPolicyHandler(CreateRetryPolicy(options))
+            .AddPolicyHandler(CreateCircuitBreakerPolicy(options));
+    }
+
+    /// <summary>
+    /// Configures HTTP client with predefined preset
+    /// </summary>
+    /// <param name="builder">HTTP client builder</param>
+    /// <param name="preset">Predefined configuration preset</param>
+    /// <param name="customizeOptions">Optional action to customize preset options</param>
+    /// <returns>HTTP client builder for method chaining</returns>
+    public static IHttpClientBuilder AddResilience(
+        this IHttpClientBuilder builder,
+        HttpClientOptions preset,
+        Action<HttpClientOptions>? customizeOptions = null)
+    {
+        customizeOptions?.Invoke(preset);
+        preset.Validate();
+
+        return builder
+            .AddPolicyHandler(CreateRetryPolicy(preset))
+            .AddPolicyHandler(CreateCircuitBreakerPolicy(preset));
     }
 
     /// <summary>

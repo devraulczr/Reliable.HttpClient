@@ -9,6 +9,24 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a complete 
 | **Reliable.HttpClient** | Core resilience (retry + circuit breaker) | Core features documented below |
 | **Reliable.HttpClient.Caching** | HTTP response caching extension | [Caching Guide](caching.md) |
 
+## What's New in v1.0+
+
+### ✨ Fluent Configuration API
+
+Easy, strongly-typed configuration with validation:
+
+```csharp
+services.AddHttpClient<ApiClient>()
+    .AddResilience(options =>
+    {
+        options.Timeout = TimeSpan.FromMinutes(1);
+        options.Retry.MaxRetries = 5;
+        options.Retry.BaseDelay = TimeSpan.FromSeconds(2);
+        options.CircuitBreaker.FailureThreshold = 10;
+        options.CircuitBreaker.OpenDuration = TimeSpan.FromMinutes(2);
+    });
+```
+
 ## Table of Contents
 
 ### Getting Started
@@ -19,7 +37,8 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a complete 
 
 ### Configuration
 
-- [Configuration Reference](configuration.md) - Complete options reference
+- [Configuration Reference](configuration.md) - Complete options reference including new Builder API
+- [Configuration Examples](examples/configuration-examples.md) - Real-world configuration patterns
 - [Retry Policies](configuration.md#retry-configuration) - Configuring retry behavior
 - [Circuit Breakers](configuration.md#circuit-breaker-configuration) - Preventing cascading failures
 - [Validation Rules](configuration.md#validation) - Understanding configuration validation
@@ -42,6 +61,7 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a complete 
 ### Examples
 
 - [Common Scenarios](examples/common-scenarios.md) - Real-world usage examples
+- [Configuration Examples](examples/configuration-examples.md) - Various configuration patterns
 - [E-commerce Integration](examples/common-scenarios.md#scenario-1-e-commerce-api-integration) - Payment and inventory APIs
 - [Microservices Communication](examples/common-scenarios.md#scenario-2-microservices-communication) - Service-to-service patterns
 - [External APIs](examples/common-scenarios.md#scenario-3-external-api-with-rate-limiting) - Handling rate limits and quotas
@@ -65,7 +85,20 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a complete 
 
 ```csharp
 builder.Services.AddHttpClient("api")
-    .AddResilience();
+    .AddResilience(); // Zero configuration required!
+```
+
+### Custom Configuration
+
+```csharp
+services.AddHttpClient<ApiClient>()
+    .AddResilience(options =>
+    {
+        options.Timeout = TimeSpan.FromMinutes(2);
+        options.Retry.MaxRetries = 4;
+        options.Retry.BaseDelay = TimeSpan.FromSeconds(2);
+        options.CircuitBreaker.FailureThreshold = 8;
+    });
 ```
 
 ### Resilience + Caching
@@ -78,27 +111,6 @@ services.AddHttpClient<ApiClient>()
     {
         options.DefaultExpiry = TimeSpan.FromMinutes(5);
     });
-```
-
-### Custom Configuration
-
-```csharp
-builder.Services.AddHttpClient("api")
-    .AddResilience(options =>
-    {
-        options.Retry.MaxRetries = 5;
-        options.CircuitBreaker.FailuresBeforeOpen = 10;
-    });
-```
-
-### Environment-Specific
-
-```csharp
-#if DEBUG
-    .AddResilience(options => options.Retry.MaxRetries = 1);
-#else
-    .AddResilience(); // Production defaults
-#endif
 ```
 
 ## Key Concepts

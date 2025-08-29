@@ -7,6 +7,96 @@ Complete reference for all configuration options in Reliable.HttpClient.
 Reliable.HttpClient provides sensible defaults that work well for most scenarios.
 You only need to configure options that differ from these defaults.
 
+## Configuration Methods
+
+### 1. Traditional Configuration
+
+Simple object property setting:
+
+```csharp
+.AddResilience(options =>
+{
+    // Configure retry settings
+    options.Retry.MaxRetries = 5;
+
+    // Configure circuit breaker settings
+    options.CircuitBreaker.FailuresBeforeOpen = 10;
+});
+```
+
+### 2. Fluent Builder Pattern
+
+Strongly-typed, IntelliSense-friendly configuration:
+
+```csharp
+.AddResilience(builder => builder
+    .WithTimeout(TimeSpan.FromMinutes(1))
+    .WithRetry(retry => retry
+        .WithMaxRetries(5)
+        .WithBaseDelay(TimeSpan.FromSeconds(2))
+        .WithJitter(0.3))
+    .WithCircuitBreaker(cb => cb
+        .WithFailureThreshold(10)
+        .WithOpenDuration(TimeSpan.FromMinutes(2))));
+```
+
+### 3. Ready-made Presets
+
+Pre-configured for common scenarios:
+
+```csharp
+// Use preset as-is
+.AddResilience(HttpClientPresets.SlowExternalApi())
+
+// Use preset with customization
+.AddResilience(HttpClientPresets.FileDownload(), options =>
+{
+    options.BaseUrl = "https://cdn.example.com";
+    options.UserAgent = "MyApp/2.0";
+})
+```
+
+## Built-in Presets
+
+| Preset                    | Timeout | Retries | Base Delay | Circuit Breaker    | Use Case                    |
+|---------------------------|---------|---------|------------|--------------------|-----------------------------|
+| `FastInternalApi()`       | 10s     | 5       | 200ms      | 3 failures, 30s   | Internal microservices      |
+| `SlowExternalApi()`       | 120s    | 2       | 2s         | 8 failures, 5m    | Third-party APIs            |
+| `FileDownload()`          | 30m     | 3       | 1s         | Disabled           | File/blob downloads         |
+| `RealTimeApi()`           | 5s      | 1       | 100ms      | 10 failures, 10s  | Low-latency APIs            |
+| `AuthenticationApi()`     | 15s     | 2       | 500ms      | 5 failures, 2m    | Auth/token endpoints        |
+| `Webhook()`               | 30s     | 1       | 1s         | Disabled           | Webhook deliveries          |
+
+### Using Presets
+
+```csharp
+// For external APIs with high latency tolerance
+services.AddHttpClient<ExternalApiClient>()
+    .AddResilience(HttpClientPresets.SlowExternalApi());
+
+// For internal microservices
+services.AddHttpClient<InternalApiClient>()
+    .AddResilience(HttpClientPresets.FastInternalApi());
+
+// For file downloads
+services.AddHttpClient<FileDownloadClient>()
+    .AddResilience(HttpClientPresets.FileDownload());
+```
+
+### Customizing Presets
+
+You can customize presets by passing an additional configuration action:
+
+```csharp
+services.AddHttpClient<MyApiClient>()
+    .AddResilience(HttpClientPresets.SlowExternalApi(), options =>
+    {
+        // Override specific settings
+        options.Retry.MaxRetries = 5;
+        options.UserAgent = "MyApp/1.0";
+    });
+```
+
 ## Main Configuration Class
 
 ### HttpClientOptions
@@ -91,57 +181,19 @@ Invalid configurations throw `ArgumentException` with descriptive error messages
 - `FailuresBeforeOpen` must be > 0
 - `OpenDuration` must be > 0
 
-## Preset Configurations
-
-### Conservative (Default)
-
-Good for most production scenarios:
-
-```csharp
-.AddResilience(); // Uses defaults
-```
-
-### Aggressive
-
-For high-traffic, fault-tolerant scenarios:
-
-```csharp
-.AddResilience(options =>
-{
-    options.Retry.MaxRetries = 5;
-    options.Retry.BaseDelay = TimeSpan.FromMilliseconds(500);
-    options.CircuitBreaker.FailuresBeforeOpen = 10;
-    options.CircuitBreaker.OpenDuration = TimeSpan.FromMinutes(2);
-});
-```
-
-### Minimal
-
-For scenarios where you want basic resilience with minimal delays:
-
-```csharp
-.AddResilience(options =>
-{
-    options.Retry.MaxRetries = 2;
-    options.Retry.BaseDelay = TimeSpan.FromMilliseconds(100);
-    options.Retry.MaxDelay = TimeSpan.FromSeconds(5);
-    options.CircuitBreaker.FailuresBeforeOpen = 3;
-});
-```
-
 ## Environment-Specific Configuration
 
-### Development
+### Development vs Production
 
 ```csharp
 #if DEBUG
-.AddResilience(options =>
-{
-    options.Retry.MaxRetries = 1; // Fail fast in development
-    options.CircuitBreaker.FailuresBeforeOpen = 2;
-});
+    .AddResilience(options =>
+    {
+        options.Retry.MaxRetries = 1; // Fast fail in development
+        options.CircuitBreaker.Enabled = false;
+    });
 #else
-.AddResilience(); // Use defaults in production
+    .AddResilience(); // Use production defaults
 #endif
 ```
 
@@ -157,7 +209,7 @@ For scenarios where you want basic resilience with minimal delays:
     },
     "CircuitBreaker": {
       "FailuresBeforeOpen": 5,
-      "DurationOfBreak": "00:01:00"
+      "OpenDuration": "00:01:00"
     }
   }
 }
