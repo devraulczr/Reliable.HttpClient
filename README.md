@@ -13,6 +13,8 @@
 ## Project Status
 
 [![Build Status](https://github.com/akrisanov/Reliable.HttpClient/workflows/Build%20%26%20Test/badge.svg)](https://github.com/akrisanov/Reliable.HttpClient/actions)
+[![codecov](https://codecov.io/gh/akrisanov/Reliable.HttpClient/branch/main/graph/badge.svg)](https://codecov.io/gh/akrisanov/Reliable.HttpClient)
+[![.NET](https://img.shields.io/badge/.NET-6.0%20%7C%208.0%20%7C%209.0-blue)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/github/license/akrisanov/Reliable.HttpClient)](LICENSE)
 
 A comprehensive resilience and caching ecosystem for HttpClient with built-in retry policies, circuit breakers, and intelligent response caching.

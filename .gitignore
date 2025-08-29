@@ -3,6 +3,7 @@ bin/
 obj/
 /artifacts/
 /TestResults/
+/CoverageReport/
 /.idea/
 /.vscode/
 /.ionide/

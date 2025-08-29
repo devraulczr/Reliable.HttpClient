@@ -1,0 +1,36 @@
+# Codecov configuration for Reliable.HttpClient
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+  ignore:
+    # Test projects
+    - "tests/**/*"
+    - "**/*.Tests/**/*"
+    - "**/*Tests.cs"
+    - "**/*Test.cs"
+
+    # Build artifacts
+    - "**/bin/**"
+    - "**/obj/**"
+
+    # Generated files
+    - "**/*.Designer.cs"
+    - "**/*.g.cs"
+    - "**/*.g.i.cs"
+    - "**/AssemblyInfo.cs"
+
+    # Entry points (usually minimal code)
+    - "**/Program.cs"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
