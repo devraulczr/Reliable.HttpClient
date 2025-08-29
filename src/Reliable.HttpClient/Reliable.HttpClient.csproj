@@ -3,11 +3,27 @@
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>Reliable.HttpClient</AssemblyName>
     <PackageId>Reliable.HttpClient</PackageId>
-    <Version>1.0.0-alpha1</Version>
-    <PackageReleaseNotes>Initial alpha release of Reliable.HttpClient (renamed from
-      HttpClient.Resilience).
-      Features: retry with exponential backoff and jitter, circuit breaker, and HTTP response
-      handling.</PackageReleaseNotes>
+    <Version>1.0.0</Version>
+    <PackageReleaseNotes>🎉 Stable v1.0.0 Release!
+
+      ✨ Features:
+      • Fluent configuration API with HttpClientOptionsBuilder
+      • 6 predefined presets for common scenarios (FastInternalApi, SlowExternalApi, etc.)
+      • Retry policies with exponential backoff and jitter
+      • Circuit breaker pattern implementation
+      • Zero-configuration setup with sensible defaults
+      • HTTP response handling with typed responses
+      • Full .NET 6.0, 8.0, 9.0 support
+
+      🔧 What's New in v1.0:
+      • Stable public API with semantic versioning commitment
+      • Production-ready defaults based on industry best practices
+      • Comprehensive documentation and examples
+      • Complete test coverage
+
+      🚀 Quick Start: services.AddHttpClient("api").AddResilience();
+
+      See full documentation at: https://github.com/akrisanov/Reliable.HttpClient</PackageReleaseNotes>
     <Authors>Andrey Krisanov</Authors>
     <Company></Company>
     <Description>Lightweight resilience helpers (retry with jitter, circuit breaker) and response
