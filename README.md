@@ -56,7 +56,7 @@ builder.Services.AddHttpClient<WeatherApiClient>()
 
 Organizations using Reliable.HttpClient in production:
 
-[![PlanFact](docs/assets/logos/planfact.png)](https://planfact.io)
+[![PlanFact](https://raw.githubusercontent.com/akrisanov/Reliable.HttpClient/refs/heads/main/docs/assets/logos/planfact.png)](https://planfact.io)
 
 ## Documentation
 

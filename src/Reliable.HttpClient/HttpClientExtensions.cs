@@ -265,7 +265,7 @@ public static class HttpClientExtensions
                 onBreak: (result, timespan) =>
                 {
                     var errorMessage = result.Exception?.Message ??
-                        (result.Result != null ? $"HTTP {(int)result.Result.StatusCode}: {result.Result.ReasonPhrase}" : "Unknown error");
+                        (result.Result is not null ? $"HTTP {(int)result.Result.StatusCode}: {result.Result.ReasonPhrase}" : "Unknown error");
 
                     logger.LogError("{ClientName} HTTP circuit breaker opened for {Duration}ms due to: {Error}",
                         clientName, timespan.TotalMilliseconds, errorMessage);
