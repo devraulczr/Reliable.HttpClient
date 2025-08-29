@@ -101,16 +101,16 @@ services.AddHttpClient<ApiClient>()
     });
 ```
 
-### Resilience + Caching
+### Resilience + Caching (New!)
 
 ```csharp
-services.AddMemoryCache();
+// One-line setup with presets
 services.AddHttpClient<ApiClient>()
-    .AddResilience()
-    .AddMemoryCache<ApiResponse>(options =>
-    {
-        options.DefaultExpiry = TimeSpan.FromMinutes(5);
-    });
+    .AddResilienceWithMediumTermCache<ApiResponse>(); // 10 minutes cache
+
+// Or choose specific presets
+services.AddHttpClient<ConfigClient>()
+    .AddResilienceWithLongTermCache<ConfigResponse>(); // 1 hour cache
 ```
 
 ## Key Concepts

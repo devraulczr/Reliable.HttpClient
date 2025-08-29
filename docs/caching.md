@@ -18,10 +18,68 @@ dotnet add package Reliable.HttpClient.Caching
 
 ## Quick Start
 
-### Basic Memory Caching
+### 🚀 New: Preset-Based Configuration (Recommended)
+
+The easiest way to add caching with resilience in one line:
 
 ```csharp
-// Add required services
+// Zero configuration - just add resilience with caching
+services.AddHttpClient<WeatherApiClient>()
+    .AddResilienceWithMediumTermCache<WeatherResponse>(); // 10 minutes cache
+```
+
+Choose from ready-made presets for common scenarios:
+
+```csharp
+// Short-term caching (1 minute) - for frequently changing data
+services.AddHttpClient<StockPriceClient>()
+    .AddShortTermCache<StockPrice>();
+
+// Medium-term caching (10 minutes) - for moderately stable data
+services.AddHttpClient<NewsClient>()
+    .AddMediumTermCache<NewsArticle>();
+
+// Long-term caching (1 hour) - for stable data
+services.AddHttpClient<CountryClient>()
+    .AddLongTermCache<Country>();
+
+// High-performance caching (5 minutes, large cache) - for high-traffic APIs
+services.AddHttpClient<PopularApiClient>()
+    .AddHighPerformanceCache<ApiResponse>();
+
+// Configuration caching (30 minutes) - for config data
+services.AddHttpClient<ConfigClient>()
+    .AddConfigurationCache<AppConfig>();
+
+// File downloads (2 hours) - for large files
+services.AddHttpClient<FileClient>()
+    .AddFileDownloadCache<FileResponse>();
+```
+
+### Combined Resilience + Caching Presets
+
+```csharp
+// Resilience with preset caching
+services.AddHttpClient<ApiClient>()
+    .AddResilienceWithShortTermCache<ApiResponse>(); // 1 minute
+
+services.AddHttpClient<ApiClient>()
+    .AddResilienceWithLongTermCache<ApiResponse>(); // 1 hour
+
+// Custom resilience with preset caching
+services.AddHttpClient<ApiClient>()
+    .AddResilienceWithCaching<ApiResponse>(
+        HttpClientPresets.SlowExternalApi(), // Resilience preset
+        CachePresets.MediumTerm               // Cache preset
+    );
+```
+
+### Legacy/Advanced Configuration
+
+For existing code or when you need full control:
+
+```csharp
+// Manual registration (legacy approach)
 services.AddMemoryCache();
 
 // Configure HttpClient with resilience and caching
@@ -34,7 +92,7 @@ services.AddHttpClient<WeatherApiClient>()
     });
 ```
 
-### Using the Cached Client
+## Using the Cached Client
 
 ```csharp
 public class WeatherApiClient
@@ -61,7 +119,16 @@ public class WeatherApiClient
 }
 ```
 
-## Configuration Options
+## Cache Presets Reference
+
+| Preset | Duration | Max Size | Best For | Example Use Cases |
+|--------|----------|----------|----------|-------------------|
+| `ShortTerm` | 1 minute | 500 | Real-time data | Stock prices, live scores, current weather |
+| `MediumTerm` | 10 minutes | 1,000 | Regular updates | News feeds, social posts, search results |
+| `LongTerm` | 1 hour | 2,000 | Stable data | Product catalogs, user profiles, reference lists |
+| `HighPerformance` | 5 minutes | 5,000 | High-traffic | Popular API endpoints, trending content |
+| `Configuration` | 30 minutes | 100 | App settings | Feature flags, configuration data |
+| `FileDownload` | 2 hours | 50 | Large files | Documents, images, downloads |
 
 ### HttpCacheOptions
 
