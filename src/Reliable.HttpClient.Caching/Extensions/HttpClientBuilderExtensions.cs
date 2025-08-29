@@ -100,7 +100,26 @@ public static class HttpClientBuilderExtensions
         options.CacheableStatusCodes = [.. preset.CacheableStatusCodes];
         options.CacheableMethods = [.. preset.CacheableMethods];
         options.ShouldCache = preset.ShouldCache;
-        options.GetExpiry = preset.GetExpiry;
+
+        // Create a new GetExpiry function that uses the correct DefaultExpiry
+        options.GetExpiry = (request, response) =>
+        {
+            // Check Cache-Control max-age directive
+            if (response.Headers.CacheControl?.MaxAge is not null)
+            {
+                return response.Headers.CacheControl.MaxAge.Value;
+            }
+
+            // Check Cache-Control no-cache or no-store directives
+            if (response.Headers.CacheControl is not null)
+            {
+                if (response.Headers.CacheControl.NoCache || response.Headers.CacheControl.NoStore)
+                    return TimeSpan.Zero;
+            }
+
+            // Fall back to the configured default expiry
+            return options.DefaultExpiry;
+        };
     }
 
     /// <summary>

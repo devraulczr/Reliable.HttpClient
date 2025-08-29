@@ -73,7 +73,7 @@ public class HttpCacheOptions
                     return TimeSpan.Zero;
             }
 
-            // Fall back to default
+            // This will be overridden to use the correct DefaultExpiry by CopyPresetToOptions
             return TimeSpan.FromMinutes(5);
         };
 }
