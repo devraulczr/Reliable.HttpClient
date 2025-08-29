@@ -1,6 +1,23 @@
 # Common Usage Scenarios
 
-Real-world examples of using Reliable.HttpClient in common scenarios.
+Real-world examples of using Reliable.HttpClient for resilience and caching in common scenarios.
+
+## Quick Reference
+
+### Core Resilience Examples
+
+- [Scenario 1: E-commerce API Integration](#scenario-1-e-commerce-api-integration)
+- [Scenario 2: Microservices Communication](#scenario-2-microservices-communication)
+- [Scenario 3: External API with Rate Limiting](#scenario-3-external-api-with-rate-limiting)
+- [Scenario 4: Legacy System Integration](#scenario-4-legacy-system-integration)
+
+### Caching Examples
+
+- [Scenario 5: Product Catalog with Caching](#scenario-5-product-catalog-with-caching)
+- [Scenario 6: Configuration Service](#scenario-6-configuration-service)
+- [Scenario 7: Weather API with Smart Caching](#scenario-7-weather-api-with-smart-caching)
+
+---
 
 ## Scenario 1: E-commerce API Integration
 
@@ -456,4 +473,166 @@ services.AddHttpClient("api", c => c.BaseAddress = new Uri("https://api.example.
 
 services.AddHealthChecks()
     .AddCheck<ApiHealthCheck>("api");
+```
+
+---
+
+## Scenario 5: Product Catalog with Caching
+
+E-commerce product catalog with intelligent caching for better performance.
+
+```csharp
+public class ProductCatalogService
+{
+    private readonly CachedHttpClient<Product> _productClient;
+    private readonly CachedHttpClient<ProductList> _catalogClient;
+
+    public ProductCatalogService(
+        CachedHttpClient<Product> productClient,
+        CachedHttpClient<ProductList> catalogClient)
+    {
+        _productClient = productClient;
+        _catalogClient = catalogClient;
+    }
+
+    public async Task<Product> GetProductAsync(int productId)
+    {
+        return await _productClient.GetAsync($"/products/{productId}");
+    }
+
+    public async Task<ProductList> GetCategoryProductsAsync(string category)
+    {
+        return await _catalogClient.GetAsync($"/categories/{category}/products");
+    }
+
+    public async Task InvalidateProductAsync(int productId)
+    {
+        await _productClient.InvalidateAsync($"/products/{productId}");
+    }
+}
+
+// Registration
+services.AddMemoryCache();
+
+// Individual products - longer cache (products don't change often)
+services.AddHttpClient<ProductCatalogService>("products")
+    .AddResilience()
+    .AddMemoryCache<Product>(options =>
+    {
+        options.DefaultExpiry = TimeSpan.FromHours(1);
+        options.VaryByHeaders = new[] { "Accept-Language", "Currency" };
+        options.MaxCacheSize = 5000;
+    });
+
+// Product lists - shorter cache (inventory changes more frequently)
+services.AddHttpClient<ProductCatalogService>("catalog")
+    .AddResilience()
+    .AddMemoryCache<ProductList>(options =>
+    {
+        options.DefaultExpiry = TimeSpan.FromMinutes(10);
+        options.VaryByHeaders = new[] { "Accept-Language" };
+    });
+```
+
+## Scenario 6: Configuration Service
+
+Centralized configuration service with caching and fallback.
+
+```csharp
+public class ConfigurationService
+{
+    private readonly CachedHttpClient<AppConfig> _cachedClient;
+    private readonly ILogger<ConfigurationService> _logger;
+    private readonly IMemoryCache _fallbackCache;
+
+    public async Task<AppConfig> GetConfigurationAsync(string environment)
+    {
+        try
+        {
+            var config = await _cachedClient.GetAsync($"/config/{environment}");
+
+            // Store successful response as fallback
+            _fallbackCache.Set($"fallback_config_{environment}", config, TimeSpan.FromDays(1));
+
+            return config;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch configuration, using fallback");
+
+            // Use fallback cache if available
+            if (_fallbackCache.TryGetValue($"fallback_config_{environment}", out AppConfig fallback))
+            {
+                return fallback;
+            }
+
+            throw;
+        }
+    }
+}
+
+// Registration
+services.AddMemoryCache();
+services.AddHttpClient<ConfigurationService>()
+    .AddResilience(options =>
+    {
+        options.Retry.MaxRetries = 3;
+        options.CircuitBreaker.FailuresBeforeOpen = 5;
+    })
+    .AddMemoryCache<AppConfig>(options =>
+    {
+        options.DefaultExpiry = TimeSpan.FromMinutes(30);
+        options.RespectCacheControlHeaders = true;
+    });
+```
+
+## Scenario 7: Weather API with Smart Caching
+
+Weather service that respects HTTP caching headers and handles rate limits.
+
+```csharp
+public class WeatherService
+{
+    private readonly CachedHttpClient<WeatherResponse> _cachedClient;
+
+    public async Task<WeatherResponse> GetCurrentWeatherAsync(string city)
+    {
+        return await _cachedClient.GetAsync($"/current?city={city}");
+    }
+
+    public async Task<WeatherResponse> GetForecastAsync(string city, int days)
+    {
+        return await _cachedClient.GetAsync($"/forecast?city={city}&days={days}");
+    }
+
+    public async Task RefreshWeatherDataAsync(string city)
+    {
+        await _cachedClient.InvalidateAsync($"/current?city={city}");
+        await _cachedClient.InvalidateAsync($"/forecast?city={city}");
+    }
+}
+
+// Registration
+services.AddMemoryCache();
+services.AddHttpClient<WeatherService>(c =>
+{
+    c.BaseAddress = new Uri("https://api.weather.com/v1");
+    c.DefaultRequestHeaders.Add("X-API-Key", "your-api-key");
+})
+.AddResilience(options =>
+{
+    // Handle rate limiting gracefully
+    options.Retry.MaxRetries = 3;
+    options.Retry.BaseDelay = TimeSpan.FromSeconds(2);
+    options.CircuitBreaker.FailuresBeforeOpen = 10;
+})
+.AddMemoryCache<WeatherResponse>(options =>
+{
+    // Respect weather API cache headers
+    options.RespectCacheControlHeaders = true;
+    options.DefaultExpiry = TimeSpan.FromMinutes(15);
+
+    // Cache per location
+    options.VaryByHeaders = new[] { "Accept-Language" };
+});
 ```

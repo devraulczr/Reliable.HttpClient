@@ -1,6 +1,13 @@
 # Reliable.HttpClient Documentation
 
-Welcome to the comprehensive documentation for Reliable.HttpClient - a lightweight resilience library for HttpClient.
+Welcome to the comprehensive documentation for Reliable.HttpClient - a complete resilience and caching ecosystem for HttpClient.
+
+## Package Overview
+
+| Package | Purpose | Documentation |
+|---------|---------|---------------|
+| **Reliable.HttpClient** | Core resilience (retry + circuit breaker) | Core features documented below |
+| **Reliable.HttpClient.Caching** | HTTP response caching extension | [Caching Guide](caching.md) |
 
 ## Table of Contents
 
@@ -16,6 +23,13 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a lightweig
 - [Retry Policies](configuration.md#retry-configuration) - Configuring retry behavior
 - [Circuit Breakers](configuration.md#circuit-breaker-configuration) - Preventing cascading failures
 - [Validation Rules](configuration.md#validation) - Understanding configuration validation
+
+### Caching
+
+- [HTTP Response Caching](caching.md) - Complete caching guide
+- [Cache Providers](caching.md#cache-providers) - Memory and custom cache providers
+- [Cache Configuration](caching.md#configuration-options) - Caching options and settings
+- [Security & Best Practices](caching.md#security-considerations) - Secure caching patterns
 
 ### Usage Patterns
 
@@ -47,11 +61,23 @@ Welcome to the comprehensive documentation for Reliable.HttpClient - a lightweig
 
 ## Quick Reference
 
-### Minimal Setup
+### Minimal Setup (Core Resilience)
 
 ```csharp
 builder.Services.AddHttpClient("api")
     .AddResilience();
+```
+
+### Resilience + Caching
+
+```csharp
+services.AddMemoryCache();
+services.AddHttpClient<ApiClient>()
+    .AddResilience()
+    .AddMemoryCache<ApiResponse>(options =>
+    {
+        options.DefaultExpiry = TimeSpan.FromMinutes(5);
+    });
 ```
 
 ### Custom Configuration
@@ -84,6 +110,10 @@ Automatically retry failed requests with exponential backoff and jitter to handl
 ### Circuit Breakers
 
 Prevent cascading failures by temporarily stopping requests to failing services and allowing them time to recover.
+
+### HTTP Response Caching
+
+Intelligent caching of HTTP responses with configurable expiration, cache providers, and security features.
 
 ### Configuration Validation
 
