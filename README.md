@@ -1,14 +1,14 @@
-# HttpClient.Resilience
+# Reliable.HttpClient
 
-[![NuGet Version](https://img.shields.io/nuget/v/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/HttpClient.Resilience)](https://www.nuget.org/packages/HttpClient.Resilience/)
-[![Build Status](https://github.com/akrisanov/HttpClient.Resilience/workflows/Build%20%26%20Test/badge.svg)](https://github.com/akrisanov/HttpClient.Resilience/actions)
-[![License](https://img.shields.io/github/license/akrisanov/HttpClient.Resilience)](LICENSE)
+[![NuGet Version](https://img.shields.io/nuget/v/Reliable.HttpClient)](https://www.nuget.org/packages/Reliable.HttpClient/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Reliable.HttpClient)](https://www.nuget.org/packages/Reliable.HttpClient/)
+[![Build Status](https://github.com/akrisanov/Reliable.HttpClient/workflows/Build%20%26%20Test/badge.svg)](https://github.com/akrisanov/Reliable.HttpClient/actions)
+[![License](https://img.shields.io/github/license/akrisanov/Reliable.HttpClient)](LICENSE)
 
 A lightweight, easy-to-use resilience library for HttpClient with built-in retry policies and circuit breakers.
 Based on [Polly](https://github.com/App-vNext/Polly) but with zero configuration required.
 
-## Why HttpClient.Resilience?
+## Why Reliable.HttpClient?
 
 - **Zero Configuration**: Works out of the box with sensible defaults
 - **Lightweight**: Minimal overhead, maximum reliability
@@ -19,7 +19,7 @@ Based on [Polly](https://github.com/App-vNext/Polly) but with zero configuration
 ## Installation & Quick Start
 
 ```bash
-dotnet add package HttpClient.Resilience
+dotnet add package Reliable.HttpClient
 ```
 
 ```csharp
@@ -54,7 +54,7 @@ builder.Services.AddHttpClient<WeatherApiClient>()
 
 ## Trusted By
 
-Organizations using HttpClient.Resilience in production:
+Organizations using Reliable.HttpClient in production:
 
 [![PlanFact](docs/assets/logos/planfact.png)](https://planfact.io)
 

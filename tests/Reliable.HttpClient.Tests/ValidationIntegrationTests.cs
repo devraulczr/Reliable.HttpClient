@@ -2,7 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace HttpClient.Resilience.Tests;
+namespace Reliable.HttpClient.Tests;
 
 public class ValidationIntegrationTests
 {

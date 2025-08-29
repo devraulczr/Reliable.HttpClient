@@ -1,4 +1,4 @@
-namespace HttpClient.Resilience;
+namespace Reliable.HttpClient;
 
 /// <summary>
 /// Base settings for HTTP clients with resilience policies
@@ -18,7 +18,7 @@ public class HttpClientOptions
     /// <summary>
     /// User-Agent for HTTP requests
     /// </summary>
-    public string UserAgent { get; set; } = "HttpClient.Resilience/1.0";
+    public string UserAgent { get; set; } = "Reliable.HttpClient/1.0";
 
     /// <summary>
     /// Retry policy configuration

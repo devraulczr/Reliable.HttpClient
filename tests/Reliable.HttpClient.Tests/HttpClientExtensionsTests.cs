@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace HttpClient.Resilience.Tests;
+namespace Reliable.HttpClient.Tests;
 
 public class HttpClientExtensionsTests
 {

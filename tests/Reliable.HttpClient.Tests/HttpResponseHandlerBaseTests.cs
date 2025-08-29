@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace HttpClient.Resilience.Tests;
+namespace Reliable.HttpClient.Tests;
 
 public class HttpResponseHandlerBaseTests
 {

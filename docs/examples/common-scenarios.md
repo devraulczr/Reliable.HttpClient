@@ -1,6 +1,6 @@
 # Common Usage Scenarios
 
-Real-world examples of using HttpClient.Resilience in common scenarios.
+Real-world examples of using Reliable.HttpClient in common scenarios.
 
 ## Scenario 1: E-commerce API Integration
 

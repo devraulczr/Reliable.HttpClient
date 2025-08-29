@@ -2,7 +2,7 @@ using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
-namespace HttpClient.Resilience;
+namespace Reliable.HttpClient;
 
 /// <summary>
 /// HTTP response handler for JSON deserialization

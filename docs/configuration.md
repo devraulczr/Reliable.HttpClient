@@ -1,10 +1,10 @@
 # Configuration Reference
 
-Complete reference for all configuration options in HttpClient.Resilience.
+Complete reference for all configuration options in Reliable.HttpClient.
 
 ## Overview
 
-HttpClient.Resilience provides sensible defaults that work well for most scenarios.
+Reliable.HttpClient provides sensible defaults that work well for most scenarios.
 You only need to configure options that differ from these defaults.
 
 ## Main Configuration Class

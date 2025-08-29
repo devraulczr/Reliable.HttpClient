@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
-    <AssemblyName>HttpClient.Resilience</AssemblyName>
-    <PackageId>HttpClient.Resilience</PackageId>
+    <AssemblyName>Reliable.HttpClient</AssemblyName>
+    <PackageId>Reliable.HttpClient</PackageId>
     <Version>1.0.0-alpha3</Version>
     <PackageReleaseNotes>Added configuration validation, performance improvements with specific
       return types,
@@ -12,7 +12,7 @@
     <Description>Lightweight resilience helpers (retry with jitter, circuit breaker) and response
       handling for HttpClient with minimal dependencies.</Description>
     <PackageTags>httpclient;resilience;polly;retry;circuit-breaker;dotnet</PackageTags>
-    <RepositoryUrl>https://github.com/akrisanov/HttpClient.Resilience</RepositoryUrl>
+    <RepositoryUrl>https://github.com/akrisanov/Reliable.HttpClient</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.8.2-beta.1" PrivateAssets="All" />
+    <PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.8.2-beta.1"
+      PrivateAssets="All" />
   </ItemGroup>
 </Project>

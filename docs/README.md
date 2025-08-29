@@ -1,6 +1,6 @@
-# HttpClient.Resilience Documentation
+# Reliable.HttpClient Documentation
 
-Welcome to the comprehensive documentation for HttpClient.Resilience - a lightweight resilience library for HttpClient.
+Welcome to the comprehensive documentation for Reliable.HttpClient - a lightweight resilience library for HttpClient.
 
 ## Table of Contents
 
@@ -96,8 +96,8 @@ Works out of the box with production-ready defaults, but allows customization wh
 ## Support
 
 - 📖 [Documentation](README.md) – This documentation site
-- 🐛 [Issues](https://github.com/akrisanov/HttpClient.Resilience/issues) – Bug reports and feature requests
-- 💬 [Discussions](https://github.com/akrisanov/HttpClient.Resilience/discussions) – Community discussions
+- 🐛 [Issues](https://github.com/akrisanov/Reliable.HttpClient/issues) – Bug reports and feature requests
+- 💬 [Discussions](https://github.com/akrisanov/Reliable.HttpClient/discussions) – Community discussions
 
 ---
 

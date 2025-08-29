@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace HttpClient.Resilience.Tests;
+namespace Reliable.HttpClient.Tests;
 
 public class HttpClientOptionsValidationTests
 {

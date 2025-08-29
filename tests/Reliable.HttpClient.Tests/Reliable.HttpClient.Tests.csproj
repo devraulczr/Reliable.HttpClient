@@ -2,11 +2,11 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <AssemblyName>HttpClient.Resilience.Tests</AssemblyName>
+    <AssemblyName>Reliable.HttpClient.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/HttpClient.Resilience/HttpClient.Resilience.csproj" />
+    <ProjectReference Include="../../src/Reliable.HttpClient/Reliable.HttpClient.csproj" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="FluentAssertions" Version="8.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />

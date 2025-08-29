@@ -1,6 +1,6 @@
 # Advanced Usage Patterns
 
-Learn advanced techniques and patterns for using HttpClient.Resilience in complex scenarios.
+Learn advanced techniques and patterns for using Reliable.HttpClient in complex scenarios.
 
 ## Multiple Named HttpClients
 

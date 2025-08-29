@@ -1,6 +1,6 @@
-# Contributing to HttpClient.Resilience
+# Contributing to Reliable.HttpClient
 
-Thank you for your interest in contributing to HttpClient.Resilience! This guide will help you get started.
+Thank you for your interest in contributing to Reliable.HttpClient! This guide will help you get started.
 
 ## Getting Started
 
@@ -16,8 +16,8 @@ Thank you for your interest in contributing to HttpClient.Resilience! This guide
 2. Clone your fork locally:
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/HttpClient.Resilience.git
-   cd HttpClient.Resilience
+   git clone https://github.com/YOUR_USERNAME/Reliable.HttpClient.git
+   cd Reliable.HttpClient
    ```
 
 3. Restore dependencies and build:
@@ -238,8 +238,8 @@ Contributors are recognized in:
 
 ## Legal
 
-By contributing to HttpClient.Resilience, you agree that your contributions will be licensed under the MIT License.
+By contributing to Reliable.HttpClient, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-Thank you for contributing to HttpClient.Resilience! Your help makes this project better for everyone. 🎉
+Thank you for contributing to Reliable.HttpClient! Your help makes this project better for everyone. 🎉

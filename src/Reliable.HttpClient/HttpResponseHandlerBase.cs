@@ -2,7 +2,7 @@ using System.Net;
 
 using Microsoft.Extensions.Logging;
 
-namespace HttpClient.Resilience;
+namespace Reliable.HttpClient;
 
 /// <summary>
 /// Base class for handling HTTP responses from external services

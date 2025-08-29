@@ -1,4 +1,4 @@
-namespace HttpClient.Resilience;
+namespace Reliable.HttpClient;
 
 /// <summary>
 /// Interface for handling HTTP responses from external services

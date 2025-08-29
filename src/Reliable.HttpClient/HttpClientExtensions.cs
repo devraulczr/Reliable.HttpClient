@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 
-namespace HttpClient.Resilience;
+namespace Reliable.HttpClient;
 
 /// <summary>
 /// Extension methods for registering HTTP clients with resilience policies

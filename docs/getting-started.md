@@ -1,11 +1,11 @@
 # Quick Start Guide
 
-Get up and running with HttpClient.Resilience in minutes.
+Get up and running with Reliable.HttpClient in minutes.
 
 ## Installation
 
 ```bash
-dotnet add package HttpClient.Resilience
+dotnet add package Reliable.HttpClient
 ```
 
 ## Basic Setup
